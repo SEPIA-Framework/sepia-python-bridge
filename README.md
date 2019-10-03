@@ -19,6 +19,8 @@ git clone https://github.com/SEPIA-Framework/sepia-python-bridge.git
 
 From bridge-server folder call:
 ```
-uvicorn main:api --reload
+uvicorn main:api --host 0.0.0.0 --port 20731 --log-level info --reload
 ```
+
+More command-line settings can be found [here](https://www.uvicorn.org/settings/) (e.g. `--no-access-log`).
 
