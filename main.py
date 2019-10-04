@@ -117,37 +117,49 @@ def get_parameter(parameter: str, input: NluInput):
 # ---- Intent interpretation:
 
 def find_user_intent_with_parameters(input: NluInput):
-    """Example of a very simple intent extraction method."""
+    """Example of a very simple intent extraction method for the SEPIA Python-Bridge demo."""
     nluResult = {}
+    text = input.text_raw.lower()
+    user_who_uploaded_demo_service = "uid1007" 	# adjust this ID if you used a different user to upload the python_bridge demo
     
     #Distinguish languages
     if input.lang == Languages.DE:
-        if "kaffee bestellen" in input.text:
+        #The main demo command
+        if "python bridge" in text or "python brücke" in text:
+            nluResult = {
+                "result": "success",
+                "command": (user_who_uploaded_demo_service + ".python_bridge"),
+                "certainty": 1.0
+            }
+        #Here is another demo answer just to give you some inspiration and show one way to give a direct answer
+        elif "bridge demo" in text:
             nluResult = {
                 "result": "success",
                 "command": "chat",
-                "certainty": 0.9,
+                "certainty": 0.5,
                 "parameters": {
-                    "reply": "Da arbeite ich gerade dran. Schau bald noch mal rein."
+                    "reply": "Ich bin nicht sicher. Falls du die Python Brücke testen willst sag bitte 'Python bridge testen'."
                 },
                 "custom_data": {
                     "note": "SEPIA-python-bridge demo"
                 }
             }
-        elif "workout" in input.text:
+    else:
+        #The main demo command
+        if "python bridge" in text:
             nluResult = {
                 "result": "success",
-                "command": "uid1007.workout_helper",
-                "certainty": 0.9
+                "command": (user_who_uploaded_demo_service + ".python_bridge"),
+                "certainty": 1.0
             }
-    else:
-        if "order coffee" in input.text:
+        #Here is another demo answer just to give you some inspiration and show one way to give a direct answer
+        elif "bridge demo" in text:
             nluResult = {
                 "result": "success",
                 "command": "chat",
-                "certainty": 0.9,
+                "certainty": 0.5,
                 "parameters": {
-                    "reply": "I'm currently working on this. Come back soon."
+                    "reply": "I'm not sure. If you want to test the Python bridge please say 'Python bridge test'."
                 },
                 "custom_data": {
                     "note": "SEPIA-python-bridge demo"
@@ -159,28 +171,29 @@ def find_user_intent_with_parameters(input: NluInput):
 # ---- Parameter handlers:
 
 #Find coffee type
-def find_parameter_coffee_type(input: NluInput):
-    """Example of a very simple parameter extraction method."""
+def find_parameter_code_word(input: NluInput):
+    """Example of a very simple parameter extraction method for SEPIA Python-Bridge demo."""
     parameterResult = {}
+    text = input.text.lower()
     
     if input.lang == Languages.DE:
-        if "schwarzen" in input.text:
+        if "freund" in text:
             parameterResult = {
                 "result": "success",
-                "found": "schwarzen",
-                "value": "black_coffee",
-                "value_local": "Schwarzer Kaffee",
+                "found": "freund",
+                "value": "friend",
+                "value_local": "Freund",
                 "extras": {
                     "source": "simplest-python-matcher"
                 }
             }
     else:
-        if "black" in input.text:
+        if "friend" in input.text:
             parameterResult = {
                 "result": "success",
-                "found": "black",
-                "value": "black_coffee",
-                "value_local": "black coffee",
+                "found": "friend",
+                "value": "friend",
+                "value_local": "Friend",
                 "extras": {
                     "source": "simplest-python-matcher"
                 }
@@ -192,5 +205,5 @@ def find_parameter_coffee_type(input: NluInput):
 
 #Mapping for handlers - add your parameter with name and handler method here:
 parameter_handlers = {
-    'coffee_type': find_parameter_coffee_type
+    'code_word': find_parameter_code_word 	#This defines the '/nlu/get_parameter/code_word' path
 }
