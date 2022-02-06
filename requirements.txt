@@ -1,0 +1,4 @@
+# Last tested 2022.02.06 with Python 3.9.2
+#
+fastapi ~= 0.70				# tested: 0.70.1
+uvicorn[standard] ~= 0.16	# tested: 0.16.0
