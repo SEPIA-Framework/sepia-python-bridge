@@ -26,7 +26,31 @@ More command-line settings can be found [here](https://www.uvicorn.org/settings/
 
 ## Integrate the server into SEPIA's NLU chain
 
-To use the Python bridge with your SEPIA-Home installation open the properties file of your SEPIA assist server (usually found at `~/SEPIA/sepia-assist-server/Xtensions/assist.custom.properties`) or use the Control-HUB to modify the line that starts with: `nlu_interpretation_chain=...`.
-This line represents the NLU interpretation chain of SEPIA. Each entry is one 'step' of the chain and steps are executed from left to right until the best NLU result is found.  
-If you're running the Python bridge server on the same machine as SEPIA-Home you can add it to the chain like this: `...,WEB:http\://127.0.0.1\:20731/nlu/get_nlu_result,...`.
-Where you put it exactly is up to you but I'd recommend to place it between `getPublicDbSentenceMatch` (the step that takes care of custom commands defined via the Teach-UI) and `getKeywordAnalyzerResult` (the most flexible NLU step) too keep most of SEPIA's default functions intact ;-) .
+The NLU interpretation chain of SEPIA consists of several consecutive processes that analyze the user input until the best NLU result is found.  
+To integrate the Python Bridge into the NLU chain follow these steps:
+- Open the properties file of your SEPIA assist server (usually: `~/SEPIA/sepia-assist-server/Xtensions/assist.custom.properties`) or use the Control-HUB to modify the line that starts with: `nlu_interpretation_chain=...`.
+- Each entry in `nlu_interpretation_chain` is one 'step' of the chain and steps are executed from left to right. Choose a good spot for your own Python NLU.
+- Where exactly you put it is up to you but a good spot is between `getPersonalCommand` (custom user commands defined via the Teach-UI or SDK) and `getKeywordAnalyzerResult` (the most flexible NLU step).
+- If you're running the Python bridge server on the same machine as SEPIA-Home add it to the chain like this: `...,WEB:http\://127.0.0.1\:20731/nlu/get_nlu_result,...`.
+- Don't forget to restart your server.
+
+## Use the bridge for custom micro-services
+
+To use the Python Bridge as server for custom micro-services you can simply import your libraries and add new HTTP endpoints at the top of the main script. See example:
+```
+# -- HTTP GET with 'q' as URL parameter
+@api.get("/my-service")
+def my_service(q: str = None):
+    if q is not None:
+        # implement your logic here
+        return {"reply": "to be implemented"}
+    else:
+        raise HTTPException(status_code=400, detail="Missing query parameter 'q'")
+```
+
+You can then access the endpoint via a simple HTTP GET call for example in custom smart-services via SEPIA Java SDK:
+```
+JSONObject response = Connectors.apacheHttpGETjson(
+	"http://127.0.0.1:20731/my-service/?q=" + URLEncoder.encode("my question", "UTF-8")
+);
+```

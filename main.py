@@ -1,9 +1,9 @@
-﻿from fastapi import FastAPI
+﻿from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import Dict, List, Any
 
 api = FastAPI()
-api_version = "0.0.3-beta"
+api_version = "0.0.4-beta"
 
 # ---- Objects:
 
@@ -62,7 +62,7 @@ class ParameterResult(BaseModel):
     extras: dict = None 	#custom extra info defined by 'you' as needed
 
 
-# ---- Endpoints:
+# ---- Core Endpoints:
 
 @api.get("/")
 def hello_world():
@@ -73,7 +73,7 @@ def return_info(info_item: str, q: str = None):
     if (info_item == "server") and (q is not None) and (q == "version"):
         return {"version": api_version}
     else:
-        return {"info": "unknown"}	
+        return {"info": "unknown"}
 
 @api.post("/nlu/get_nlu_result")
 def return_nlu_result(input: NluInput):
@@ -83,6 +83,16 @@ def return_nlu_result(input: NluInput):
 def return_parameter(parameter: str, input: NluInput):
     return get_parameter(parameter, input)
 
+# ---- Custom Endpoints:
+
+# -- Example GET with 'q' as URL parameter
+@api.get("/my-service")
+def my_service(q: str = None):
+    if q is not None:
+        # implement your logic here
+        return {"myReply": "to be implemented"}
+    else:
+        raise HTTPException(status_code=400, detail="Missing query parameter 'q'")
 
 # ---- NLU:
 
@@ -170,7 +180,8 @@ def find_user_intent_with_parameters(input: NluInput):
 
 # ---- Parameter handlers:
 
-#Find coffee type
+#DEMO parameter 'code_word' for 'PythonBridgeDemo' SDK service.
+#See: https://github.com/SEPIA-Framework/sepia-extensions
 def find_parameter_code_word(input: NluInput):
     """Example of a very simple parameter extraction method for SEPIA Python-Bridge demo."""
     parameterResult = {}
